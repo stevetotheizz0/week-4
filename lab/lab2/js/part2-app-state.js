@@ -30,10 +30,40 @@
        var one = justOne();
 ===================== */
 
-var downloadData = $.ajax("");
-var parseData = function() {};
-var makeMarkers = function() {};
-var plotMarkers = function() {};
+
+var downloadData = $.ajax("https://raw.githubusercontent.com/CPLN690-MUSA610/datasets/master/json/philadelphia-solar-installations.json");
+
+var parseData = function(ajaxResponseValue) {
+  return JSON.parse(ajaxResponseValue);
+};
+
+
+var makeMarkers = function(makeData) {
+  return _.map(makeData, function(feature){
+    return  L.marker([parseFloat(feature.Y), parseFloat(feature.X)]);
+  });
+};
+
+var plotMarkers = function(markersToPlot){
+  return _.map(markersToPlot, function(markery){
+    return L.marker(markery._latlng).addTo(map);});
+};
+
+// Add marker to map at click location; add popup window
+
+
+downloadData.done(function(data) {
+  var parsed = parseData(data);
+  var markers =  makeMarkers(parsed);
+  var plotted = plotMarkers(markers);
+  removeMarkers(plotted);
+});
+
+var removeMarkers = function(markersToRemove) {
+    _.each(markersToRemove, function (removeIt) {
+      map.removeLayer(removeIt);
+    });
+};
 
 
 /* =====================
@@ -49,7 +79,7 @@ var plotMarkers = function() {};
   user's input.
 ===================== */
 
-var removeMarkers = function() {};
+
 
 /* =====================
   Optional, stretch goal
@@ -62,12 +92,11 @@ var removeMarkers = function() {};
  CODE EXECUTED DOWN HERE!
 ===================== */
 
-downloadData.done(function(data) {
-  var parsed = parseData(data);
-  var markers = makeMarkers(parsed);
-  plotMarkers(markers);
-  removeMarkers(markers);
-});
+
+
+
+
+
 
 /* =====================
  Leaflet setup
