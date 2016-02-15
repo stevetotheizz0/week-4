@@ -27,11 +27,14 @@
   Define a resetMap function to remove markers from the map and clear the array of markers
 ===================== */
 
-var resetMap = function(markersToRemove) {
-  console.log("1 resetMap");
-  _.each(markersToRemove, function (removeIt) {
+var myData = [];
+
+var resetMap = function() {
+  console.log("part 1 reset",myMarkers);
+  _.each(myMarkers, function (removeIt) {
     map.removeLayer(removeIt);
   });
+  myMarkers = [];
 };
 
 /* =====================
@@ -39,36 +42,11 @@ var resetMap = function(markersToRemove) {
   will be called as soon as the application starts. Be sure to parse your data once you've pulled
   it down!
 ===================== */
+
 var getAndParseData = function() {
-  /* =====================
-    Fill out this function definition
-  ===================== */
-  var downloadData = $.ajax("https://raw.githubusercontent.com/CPLN690-MUSA610/datasets/master/json/philadelphia-solar-installations.json");
-  console.log("2 getAndParseData");
-  var parseData = function(ajaxResponseValue) {
-    console.log("3 parseData function");
+  $.ajax("https://raw.githubusercontent.com/CPLN690-MUSA610/datasets/master/json/philadelphia-solar-installations.json").done(function(ajaxResponseValue){
     var parsed = JSON.parse(ajaxResponseValue);
-    return _.filter(parsed, function(filter){
-        //if( filter.YEARBUILT > 2010) {console.log(filter.YEARBUILT);}
-        return filter.YEARBUILT > numericField1 ;});
-  };
-
-  var makeMarkers = function(makeData) {
-    console.log("4 Make makrers function");
-    return _.map(makeData, function(feature){
-      return  L.marker([parseFloat(feature.Y), parseFloat(feature.X)]);
-    });
-  };
-
-
-
-  downloadData.done(function(data) {
-    var parsed = parseData(data);
-    //console.log(parsed);
-    var markers =  makeMarkers(parsed);
-    var plotted = plotData(markers);
-    console.log("5 Done part of main function");
-    return plotted;
+     _.map(parsed, function(x){  myData.push(x);});
   });
 };
 
@@ -76,9 +54,17 @@ var getAndParseData = function() {
   Call our plotData function. It should plot all the markers that meet our criteria (whatever that
   criteria happens to be — that's entirely up to you)
 ===================== */
-var plotData = function(markersToPlot) {
-    console.log("6 of 6 plot data");
-    return _.map(markersToPlot, function(markery){
-      return L.marker(markery._latlng).addTo(map);
-    });
+
+var plotData = function() {
+  numFilter = _.filter(myData, function(filter){
+    return( filter.YEARBUILT > numericField1 && filter.YEARBUILT < numericField2 && booleanField === true);
+  });
+  currentState = _.where(numFilter, {NAME: stringField});
+  myMarkers = _.map(currentState, function(feature){
+    return L.marker([parseFloat(feature.Y), parseFloat(feature.X)]).addTo(map);
+  });
+  _.each(myMarkers,function(makeMarker){
+    makeMarker.addTo(map);
+  });
+  console.log(_.where(myData, {NAME: stringField}));
 };

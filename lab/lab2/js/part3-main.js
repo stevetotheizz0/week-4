@@ -29,6 +29,7 @@ $('button#my-button').click(function(e) {
     Call our resetMap function to remove markers from the map and clear out the array of marker
     objects
   ===================== */
+
   resetMap();
 
   /* =====================
